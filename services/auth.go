@@ -39,7 +39,10 @@ func (service *AuthService) Refresh(tokenIn *entities.TokenIn) (*entities.Token,
 	if err != nil {
 		return nil, errors.New("bad token")
 	}
-	if token.Expired || token.RefreshExpiresAt < time.Now().Unix() {
+	if now := time.Now().Unix(); token.Expired || token.RefreshExpiresAt < now {
+		if token.RefreshExpiresAt < now {
+			service.repo.SetExpired(token.UserId, token.AccessId)
+		}
 		return nil, errors.New("refresh expired")
 	}
 	service.repo.SetExpired(token.UserId, tokenIn.AccessId)

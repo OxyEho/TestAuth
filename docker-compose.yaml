@@ -6,8 +6,6 @@ services:
     restart: always
     volumes:
       - db_volume:/data/db
-    ports:
-      - "27017:27017" # for debug
     env_file:
       - .env
   srv:
