@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - db_volume:/data/db
+    ports:
+      - "27017:27017" # for debug
+    env_file:
+      - .env
+  srv:
+    build: ./
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file: .env
+    depends_on:
+      - mongo
+volumes:
+  db_volume:
