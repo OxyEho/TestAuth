@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var secret = services.GenerateBytes(16)
+var secret = services.GenerateBytes(64)
 
 type JsonToken struct {
 	Access  string `json:"access"`

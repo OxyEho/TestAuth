@@ -35,7 +35,8 @@ func (service *AuthService) Refresh(tokenIn *entities.TokenIn) (*entities.Token,
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(token.Refresh), []byte(tokenIn.Refresh))
+	refreshBytes, _ := base64.StdEncoding.DecodeString(tokenIn.Refresh)
+	err = bcrypt.CompareHashAndPassword([]byte(token.Refresh), refreshBytes)
 	if err != nil {
 		return nil, errors.New("bad token")
 	}
@@ -52,17 +53,18 @@ func (service *AuthService) Refresh(tokenIn *entities.TokenIn) (*entities.Token,
 }
 
 func getHashToken(token *entities.Token) *entities.Token {
+	refreshBytes, _ := base64.StdEncoding.DecodeString(token.Refresh)
 	return &entities.Token{
 		UserId:           token.UserId,
 		AccessId:         token.AccessId,
-		Refresh:          hash(token.Refresh),
+		Refresh:          hash(refreshBytes),
 		RefreshExpiresAt: token.RefreshExpiresAt,
 		Expired:          false,
 	}
 }
 
-func hash(t string) string {
-	bytes, _ := bcrypt.GenerateFromPassword([]byte(t), 6)
+func hash(t []byte) string {
+	bytes, _ := bcrypt.GenerateFromPassword(t, 6)
 	return string(bytes)
 }
 
